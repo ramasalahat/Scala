@@ -1,6 +1,7 @@
 import org.apache.spark.SparkContext
 import org.apache.spark.SparkConf
 import java.io.{File, PrintWriter}
+import play.api.libs.json._
 
 import purecsv.safe._
 import org.json4s.native.JsonMethods._
@@ -65,7 +66,7 @@ object positionalIndexing extends App {
     }
   }
   //turn the result into a json object
-  val json = compact(render ("wordIndexes" -> finalResult.collect().toList.map{(word_record) =>
+  val json = compact(render (finalResult.collect().toList.map{(word_record) =>
       ("name", word_record._1)~
         ("documents Count", word_record._2.length)~
         ("documents", word_record._2.flatten.map(record =>
@@ -79,8 +80,18 @@ object positionalIndexing extends App {
   writer.close()
 
 
-  //prompt user to input phrase
-  var input_value = scala.io.StdIn.readLine()
+  //prompt user to input phrase and get the mapings for all the inputted terms
+  var input_value = scala.io.StdIn.readLine().split(" ")
+    .map{x=>
+      finalResult.collect().toList.toMap.get(x).get.flatten
+    }
+
+  var joined = (input_value(0).flatMap{case (ka,va) => input_value(1).toMap.get(ka).map(vb => (ka, List(va,vb)))})
+  for (a <- 2 to input_value.length-1){
+    joined = (joined.flatMap{case (ka,va) => input_value(a).toMap.get(ka).map(vb => (ka, va :+ vb))})
+  }
+  joined.foreach(println)
+
 
 }
 

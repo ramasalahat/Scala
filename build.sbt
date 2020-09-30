@@ -12,3 +12,5 @@ libraryDependencies += "org.json4s" %% "json4s-native" % "3.5.3"
 libraryDependencies ++= Seq("com.github.melrief" %% "purecsv" % "0.1.1")
 
 libraryDependencies += "org.elasticsearch" % "elasticsearch-hadoop" % "5.1.1"
+
+libraryDependencies += "com.typesafe.play" %% "play-json" % "2.8.1"
